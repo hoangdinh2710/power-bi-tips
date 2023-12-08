@@ -1,4 +1,4 @@
 .vs/
-.api/__pycache__/
-.api/poc.ipynb
+api/__pycache__/
+api/poc.ipynb
 .env
