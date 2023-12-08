@@ -53,7 +53,7 @@ def get_all_workspaces(header):
 def get_all_datasets(header):
 
     # Set workspace list
-    df_get_all_workspaces = get_all_workspaces()
+    df_get_all_workspaces = get_all_workspaces(header)
     workspace_id_list = df_get_all_workspaces['id']
     # Define an empty dataframe
     df_get_all_datasets = pd.DataFrame()
@@ -73,14 +73,14 @@ def get_all_datasets(header):
             # Add workspace name column
             df['workspaceName'] = workspace_name
             # Append data
-            df_get_all_datasets = df_get_all_datasets.append(df)
+            df_get_all_datasets = pd.concat([df_get_all_datasets,df])
     
     return df_get_all_datasets
 
 def get_all_dataflows(header):
 
     # Set workspace list
-    df_get_all_workspaces = get_all_workspaces()
+    df_get_all_workspaces = get_all_workspaces(header)
     workspace_id_list = df_get_all_workspaces['id']
     # Define an empty dataframe
     df_get_all_dataflows = pd.DataFrame()
@@ -88,7 +88,7 @@ def get_all_dataflows(header):
     for workspace_id in workspace_id_list:
         workspace_name = df_get_all_workspaces.query('id == "{0}"'.format(workspace_id))["name"].iloc[0]
         # Define URL endpoint
-        get_all_dataflows_url =  'https://api.powerbi.com/v1.0/myorg/groups/{0}/dataflows'.format(workspace_id)
+        get_all_dataflows_url =  f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/dataflows'
         # Send API call to get data
         result = requests.get(url=get_all_dataflows_url, headers=header)
         # If result success then proceed:
@@ -100,13 +100,13 @@ def get_all_dataflows(header):
             # Add workspace name column
             df['workspaceName'] = workspace_name
             # Append data
-            df_get_all_dataflows = df_get_all_dataflows.append(df)
+            df_get_all_dataflows = pd.concat([df_get_all_dataflows,df])
     return df_get_all_dataflows
 
 def get_all_reports(header):
 
     # Set workspace list
-    df_get_all_workspaces = get_all_workspaces()
+    df_get_all_workspaces = get_all_workspaces(header)
     # Set workspace list
     workspace_id_list = df_get_all_workspaces['id']
     # Define an empty dataframe
@@ -115,7 +115,7 @@ def get_all_reports(header):
     for workspace_id in workspace_id_list:
         workspace_name = df_get_all_workspaces.query('id == "{0}"'.format(workspace_id))["name"].iloc[0]
         # Define URL endpoint
-        get_all_reports_url =  'https://api.powerbi.com/v1.0/myorg/groups/{0}/reports'.format(workspace_id)
+        get_all_reports_url =  f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/reports'
         # Send API call to get data
         result = requests.get(url=get_all_reports_url, headers=header)
         # If result success then proceed:
@@ -125,7 +125,7 @@ def get_all_reports(header):
             # Add workspace name column
             df['workspaceName'] = workspace_name
             # Append data
-            df_get_all_reports = df_get_all_reports.append(df)
+            df_get_all_reports = pd.concat([df_get_all_reports,df])
     return df_get_all_reports
 
 
@@ -145,28 +145,57 @@ def refresh_dataset(header, workspace_id,dataset_id):
     # Print message
     print(f'Start refreshing dataset {dataset_id}')
     
-def get_report_users(header,workspace_id,report_id):
-    # Define URL
-    url = f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/reports/{report_id}/users'
-    # Send GET request
-    result = requests.get(url, headers= header)
-    # Convert to dataframe
-    df_get_report_users = pd.DataFrame.from_dict(result.json()['value'], orient ='columns')
-    # Print message
-    print(f'Get report users {report_id}')
-    return df_get_report_users
-    # Print message
+def get_all_report_users(header,workspace_id,report_id):
 
-def get_dataset_users(header,workspace_id,dataset_id):
-    # Define URL
-    url = f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/datasets/{dataset_id}/users'
-    # Send GET request
-    result = requests.get(url, headers= header)
-    # Convert to dataframe
-    df_get_dataset_users = pd.DataFrame.from_dict(result.json()['value'], orient ='columns')
-    # Print message
-    print(f'Get dataset users {dataset_id}')
-    return df_get_dataset_users
+    # Set workspace list
+    df_get_all_workspaces = get_all_workspaces(header)
+    # Set workspace list
+    workspace_id_list = df_get_all_workspaces['id']
+    # Define an empty dataframe
+    df_get_all_report_users = pd.DataFrame()
+    # Loop through workspace
+    for workspace_id in workspace_id_list:
+        workspace_name = df_get_all_workspaces.query('id == "{0}"'.format(workspace_id))["name"].iloc[0]
+        # Define URL endpoint
+        get_all_report_users_url =  f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/reports/{report_id}/users'
+        # Send API call to get data
+        result = requests.get(url=get_all_report_users_url, headers=header)
+        # If result success then proceed:
+        if result.status_code == 200:
+            # Create dataframe to store data
+            df = pd.DataFrame.from_dict(result.json()['value'], orient ='columns')
+            # Add workspace name column
+            df['workspaceName'] = workspace_name
+            # Append data
+            df_get_all_report_users = pd.concat([df_get_all_report_users,df])
+
+    return df_get_all_report_users
+
+def get_all_dataset_users(header,workspace_id,dataset_id):
+
+    # Set workspace list
+    df_get_all_workspaces = get_all_workspaces(header)
+    # Set workspace list
+    workspace_id_list = df_get_all_workspaces['id']
+    # Define an empty dataframe
+    df_get_all_dataset_users = pd.DataFrame()
+    # Loop through workspace
+    for workspace_id in workspace_id_list:
+        workspace_name = df_get_all_workspaces.query('id == "{0}"'.format(workspace_id))["name"].iloc[0]
+        # Define URL endpoint
+        get_all_dataset_users_url =  f'https://api.powerbi.com/v1.0/myorg/groups/{workspace_id}/datasets/{dataset_id}/users'
+        # Send API call to get data
+        result = requests.get(url=get_all_dataset_users_url, headers=header)
+        # If result success then proceed:
+        if result.status_code == 200:
+            # Create dataframe to store data
+            df = pd.DataFrame.from_dict(result.json()['value'], orient ='columns')
+            # Add workspace name column
+            df['workspaceName'] = workspace_name
+            # Append data
+            df_get_all_dataset_users = pd.concat([df_get_all_dataset_users,df])
+
+    return df_get_all_dataset_users
 
     
 def update_parameter(header,workspace_id,dataset_id):
@@ -191,4 +220,3 @@ def update_parameter(header,workspace_id,dataset_id):
 
     # Print Message
     print('Start updating parameter {0}'.format(dataset_id))
-    

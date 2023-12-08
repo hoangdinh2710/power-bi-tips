@@ -3,3 +3,4 @@ __pycache__/
 .env
 poc
 poc.ipynb
+get_pbi_refresh_logs_and_metadata.ipynb
