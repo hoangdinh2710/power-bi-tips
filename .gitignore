@@ -1,4 +1,5 @@
 .vs/
-api/__pycache__/
-api/poc.ipynb
+__pycache__/
 .env
+poc
+poc.ipynb
